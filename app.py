@@ -44,7 +44,7 @@ def format_with_gemini(raw_text, key):
     """
 
     response = client.models.generate_content(
-        model="gemini-flash", contents=prompt
+        model="gemini-2.0-flash", contents=prompt
     )
     return response.text
 
