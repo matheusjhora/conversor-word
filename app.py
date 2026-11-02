@@ -1,17 +1,13 @@
 import docx
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
-import pypdf
 import streamlit as st
 
-# Configuração da página para telemóvel/PC
 st.set_page_config(
     page_title="Conversor para Word", page_icon="📄", layout="centered"
 )
 
 st.title("📄 Conversor de Texto/Fórmulas para Word (.docx)")
 st.write(
-    "Envia um ficheiro (.txt ou .pdf) ou cola o texto formatado abaixo para gerar o documento Word."
+    "Cola o teu texto formatado abaixo para gerar o ficheiro .docx pronto."
 )
 
 
@@ -48,56 +44,25 @@ def generate_word_doc(text_input):
         else:
             p.add_run(line_str)
 
-    output_path = "documento_formatado.docx"
+    output_path = "estudo_formatado.docx"
     doc.save(output_path)
     return output_path
 
 
-# 1. Opção de Upload de Ficheiro
-uploaded_file = st.file_uploader(
-    "Carrega um ficheiro (.txt ou .pdf)", type=["txt", "pdf"]
-)
+# Caixa de Texto Única
+user_text = st.text_area("Cola o teu conteúdo aqui:", height=300)
 
-extracted_text = ""
-
-if uploaded_file is not None:
-    if uploaded_file.name.endswith(".txt"):
-        extracted_text = uploaded_file.read().decode("utf-8")
-    elif uploaded_file.name.endswith(".pdf"):
-        pdf_reader = pypdf.PdfReader(uploaded_file)
-        for page in pdf_reader.pages:
-            text = page.extract_text()
-            if text:
-                extracted_text += text + "\n"
-
-# 2. Caixa de Texto
-user_text = st.text_area(
-    "Ou cola o teu conteúdo aqui:", value=extracted_text, height=300
-)
-
-# 3. Nome Personalizado do Ficheiro
-file_name_input = st.text_input(
-    "Nome do ficheiro para salvar (sem extensão):", value="estudo_formatado"
-)
-
-# 4. Botão de Geração
+# Botão Único de Geração
 if st.button("Gerar Ficheiro Word"):
     if user_text.strip():
         file_path = generate_word_doc(user_text)
-
-        clean_name = (
-            file_name_input.strip() if file_name_input.strip() else "estudo"
-        )
-        final_filename = f"{clean_name}.docx"
 
         with open(file_path, "rb") as fp:
             st.download_button(
                 label="📥 Descarregar ficheiro .docx",
                 data=fp,
-                file_name=final_filename,
+                file_name="estudo_formatado.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             )
     else:
-        st.warning(
-            "Por favor, carrega um ficheiro ou cola texto antes de gerar."
-        )
+        st.warning("Por favor, cola o texto antes de gerar.")
